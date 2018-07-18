@@ -29,7 +29,7 @@ compileTestKotlin {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile 'org.jetbrains.exposed:exposed:0.9.1'
+    compile 'org.jetbrains.exposed:exposed:0.10.3'
     compile 'org.postgresql:postgresql:42.2.1'
     compile 'com.zaxxer:HikariCP:2.7.7'
     testCompile 'junit:junit:4.12'

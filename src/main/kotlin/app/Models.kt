@@ -7,18 +7,25 @@ import org.joda.time.DateTimeZone
 
 fun currentUtc(): DateTime = DateTime.now(DateTimeZone.UTC)
 
-open class BaseEntity(id: EntityID<Int>) : IntEntity(id) {
+fun DateTime.toUtc(): DateTime = this.toDateTime(DateTimeZone.UTC)
 
-    open var createdAt: DateTime? = null
-    open var updatedAt: DateTime? = null
+abstract class BaseIntIdTable(name: String) : IntIdTable(name) {
+    val createdAt = datetime("createdAt").nullable()
+    val updatedAt = datetime("updatedAt").nullable()
+}
+
+abstract class BaseIntEntity(id: EntityID<Int>, table: BaseIntIdTable) : IntEntity(id) {
+    var createdAt by table.createdAt
+    var updatedAt by table.updatedAt
+}
+
+abstract class BaseIntEntityClass<E : BaseIntEntity>(table: BaseIntIdTable) : IntEntityClass<E>(table) {
 
     init {
         EntityHook.subscribe { action ->
             if (action.changeType == EntityChangeType.Created) {
                 try {
-                    val time = currentUtc()
-                    println("Setting createdAt for $idValue to $time")
-                    createdAt = time
+                    action.toEntity(this)?.createdAt = currentUtc()
                 } catch (e: Exception) {
                     //nothing much to do here
                 }
@@ -28,9 +35,7 @@ open class BaseEntity(id: EntityID<Int>) : IntEntity(id) {
         EntityHook.subscribe { action ->
             if (action.changeType == EntityChangeType.Updated) {
                 try {
-                    val time = currentUtc()
-                    println("Setting updatedAt for $idValue to $time")
-                    updatedAt = time
+                    action.toEntity(this)?.updatedAt = currentUtc()
                 } catch (e: Exception) {
                     //nothing much to do here
                 }
@@ -39,36 +44,27 @@ open class BaseEntity(id: EntityID<Int>) : IntEntity(id) {
     }
 }
 
-val BaseEntity.idValue: Int
+val BaseIntEntity.idValue: Int
     get() = this.id.value
 
-
-object Users : IntIdTable("users") {
+object Users : BaseIntIdTable("users") {
     val name = varchar("name", length = 60)
     val role = reference("roleId", Roles, onDelete = ReferenceOption.NO_ACTION).nullable()
-    val createdAt = datetime("createdAt").nullable()
-    val updatedAt = datetime("updatedAt").nullable()
 }
 
-class User(id: EntityID<Int>) : BaseEntity(id) {
-    companion object : IntEntityClass<User>(Users)
+class User(id: EntityID<Int>) : BaseIntEntity(id, Users) {
+    companion object : BaseIntEntityClass<User>(Users)
 
     var name by Users.name
     var role by Role optionalReferencedOn Users.role
-    override var createdAt by Users.createdAt
-    override var updatedAt by Users.updatedAt
 }
 
-object Roles : IntIdTable("roles") {
+object Roles : BaseIntIdTable("roles") {
     val name = varchar("name", length = 60)
-    val createdAt = datetime("createdAt").nullable()
-    val updatedAt = datetime("updatedAt").nullable()
 }
 
-class Role(id: EntityID<Int>) : BaseEntity(id) {
-    companion object : IntEntityClass<Role>(Roles)
+class Role(id: EntityID<Int>) : BaseIntEntity(id, Roles) {
+    companion object : BaseIntEntityClass<Role>(Roles)
 
     var name by Roles.name
-    override var createdAt by Roles.createdAt
-    override var updatedAt by Roles.updatedAt
 }

@@ -23,9 +23,9 @@ class DatesAutoFillTest {
         fun setup() {
             // init db
             val dataSource = HikariDataSource()
-            dataSource.jdbcUrl = "jdbc:postgresql://localhost:5432/exposed_auto_fill_dates?ssl=false"
+            dataSource.jdbcUrl = "jdbc:postgresql://localhost:5432/testdb?ssl=false"
             dataSource.username = "test"
-            dataSource.password = "test"
+            dataSource.password = "testpassword"
             Database.connect(dataSource)
         }
     }
