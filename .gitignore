@@ -1,0 +1,11 @@
+*.iml
+.gradle
+build
+captures
+.externalNativeBuild
+.idea
+projectFilesBackup
+*.jar
+out
+*.log
+logs
