@@ -65,7 +65,7 @@ class DatesAutoFillTest {
             User[userId]
         }
 
-        assertTrue(user.createdAt != null && user.createdAt!! > dateBeforeTransaction)
+        assertTrue(user.createdAt > dateBeforeTransaction)
         assertTrue(user.updatedAt == null)
     }
 
@@ -88,7 +88,6 @@ class DatesAutoFillTest {
             val userId = userRow[Users.id]
             val createdAt = userRow[Users.createdAt]
 
-            assertTrue(createdAt != null)
             assertTrue(userRow[Users.updatedAt] == null)
 
             // do an update

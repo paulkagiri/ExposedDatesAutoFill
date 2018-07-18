@@ -9,7 +9,7 @@ import org.junit.*
 
 object Animals : IntIdTable("Animals") {
     val name = varchar("name", length = 60)
-    val createdAt = long("timestamp").default(System.currentTimeMillis())
+    val createdAt = long("timestamp").clientDefault { System.currentTimeMillis() }
 }
 
 class Animal(id: EntityID<Int>) : IntEntity(id) {
